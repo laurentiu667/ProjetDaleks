@@ -1,6 +1,6 @@
 
 import random
-#test qu cvm
+#test laurentiu je suis la
 class Jeu():
     def __init__(self):
         self.partie = None
