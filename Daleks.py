@@ -1,6 +1,6 @@
 
 import random
-
+#test qu cvm
 class Jeu():
     def __init__(self):
         self.partie = None
