@@ -1,13 +1,12 @@
 
 import random
-#test laurentiu je suis la
+
 class Jeu():
     def __init__(self):
         self.partie = None
         self.nom_joueur = None
     def jouer_coup(self, rep):
         self.partie.jouer_coup(rep)
-        # return jouer_coup
 
     def creer_partie(self):
         self.partie = Partie()
@@ -38,7 +37,6 @@ class Partie():
             y = random.randrange(self.airdejeux.hauteur)
             dalek = Dalek(x, y)
             self.daleks.append(dalek)
-
 
 class Airedejeu():
     def __init__(self, largeur: int, hauteur: int):
@@ -118,7 +116,6 @@ class Vue():
 
         for i in tablo:
             print(i)
-
         return self.jouer_coup()
 
     def jouer_coup(self):
@@ -147,13 +144,6 @@ class Controleur():
 
         rep_coup = self.modele.jouer_coup(rep)
         # rep = self.vue.afficher_aire_de_jeux(self.modele)
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     c = Controleur()
