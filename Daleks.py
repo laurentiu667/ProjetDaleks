@@ -1,4 +1,3 @@
-
 import random
 
 class Jeu():
@@ -13,7 +12,7 @@ class Jeu():
 
 class Partie():
     def __init__(self):
-        self.airdejeux = Airedejeu(8, 3)
+        self.airdejeux = Airedejeu(8, 10)
         self.docteur = Docteur(2, 0)
         self.daleks = []
         self.niveau = 0
@@ -22,11 +21,7 @@ class Partie():
 
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
-        # bouger Daleks
-
-        # test etat du jeu
-
-        # retourner reponse approprier
+        # Faire bouger les daleks suivant le docteur 
         return True
 
     def creer_niveau(self):
@@ -147,6 +142,3 @@ class Controleur():
 
 if __name__ == "__main__":
     c = Controleur()
-
-
-
