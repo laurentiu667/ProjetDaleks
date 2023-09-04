@@ -1,5 +1,7 @@
 import random
 
+
+# test laurentiu je suis la
 class Jeu():
     def __init__(self):
         self.partie = Partie()
@@ -12,9 +14,10 @@ class Jeu():
     def creer_partie(self):
         self.partie = Partie()
 
+
 class Partie():
     def __init__(self):
-        self.airdejeux = Airedejeu(10, 8)
+        self.airdejeux = Airedejeu(8, 10)
         self.docteur = Docteur(2, 0)
         self.daleks = []
         self.niveau = 0
@@ -35,10 +38,15 @@ class Partie():
             return False
         return True
 
+    def choix_possible(self, rep):
+        if rep.isnumeric():
+            numrep = int(rep)
+            if ((numrep >= 1) and (numrep <= 9)):
+                return True
+
         # test etat du jeu
 
         # retourner reponse approprier
-        return True
 
     def creer_niveau(self):
         self.niveau += 1
@@ -49,10 +57,12 @@ class Partie():
             dalek = Dalek(x, y)
             self.daleks.append(dalek)
 
+
 class Airedejeu():
     def __init__(self, largeur: int, hauteur: int):
         self.largeur = largeur
         self.hauteur = hauteur
+
 
 class Docteur():
     # tester les limites avant
@@ -65,10 +75,12 @@ class Docteur():
         self.x += rel_x
         self.y += rel_y
 
+
 class Ferraille():
     def __init__(self):
         self.x = None
         self.y = None
+
 
 class Dalek():
     def __init__(self, x, y):
@@ -122,19 +134,18 @@ class Vue():
 
     def afficher_aire_de_jeux(self, partie):
         tablo = self.creer_tablo(partie)
+
         for i in partie.daleks:
             tablo[i.y][i.x] = "W"
 
         tablo[partie.docteur.y][partie.docteur.x] = "D"
-
 
         for i in tablo:
             print(i)
 
         return self.jouer_coup(partie)
 
-    def contact_dalek_docteur(self, partie, controleur): # Partie faite par Laurentiu
-
+    def contact_dalek_docteur(self, partie, controleur):  # Partie faite par Laurentiu
         for dalek in partie.daleks:
             if dalek.x == partie.docteur.x and dalek.y == partie.docteur.y:
                 controleur.partie_en_cours = False
@@ -142,17 +153,17 @@ class Vue():
                 break
 
     def jouer_coup(self, partie):  # ajout du parametre partie pour que les donnés de la partie en cours soit transmi
-        print("Jouer votre coups SVP")  # si dans vue self.partie = Partie() alors donnée d'une new partie
-        print("(Utilisez votre clavier numerique)")
-        rep = input("Votre choix ici : ")
-        vrai_rep = self.pos_possibles[rep]
-        while not partie.mouvement_permis(vrai_rep, partie.docteur):  # ajout parametre partie.docteur et un while pour tant que le deplacement est permis
-            print("Mouvement impossible")  # pour empecher le joueur de leave 'l'air de jeux
-            print("Veuillez Rejouer votre coups SVP")
-            rep = input("Votre choix ici : ")
-            vrai_rep = self.pos_possibles[rep]
-        print(rep, vrai_rep)
 
+        numvalide = False
+        while not numvalide:
+            print("Jouer votre coups SVP")  # si dans vue self.partie = Partie() alors donnée d'une new partie
+            print("(Utilisez votre clavier numerique)")
+            rep = input("Votre choix ici : ")
+            if partie.choix_possible(rep):
+                vrai_rep = self.pos_possibles[rep]
+                if partie.mouvement_permis(vrai_rep, partie.docteur):
+                    numvalide = True
+        print(rep, vrai_rep)
         return vrai_rep
 
 
@@ -162,7 +173,7 @@ class Controleur():
         self.modele = Jeu()
         self.vue = Vue()
         rep = self.vue.afficher_menu_initial()
-        if rep == "j":
+        if rep == "j" or "J":
             self.modele.creer_partie()
             self.partie_en_cours = True
             self.jouer_partie()
@@ -171,8 +182,12 @@ class Controleur():
         while self.partie_en_cours:
             rep = self.vue.afficher_aire_de_jeux(self.modele.partie)
             self.modele.jouer_coup(rep)
-            self.vue.contact_dalek_docteur(self.modele.partie, self) # Partie faite par Laurentiu
+            self.vue.contact_dalek_docteur(self.modele.partie, self)  # Partie faite par Laurentiu
+
 
 if __name__ == "__main__":
     c = Controleur()
+
+
+
 
