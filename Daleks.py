@@ -1,9 +1,9 @@
-
 import random
+
 #test laurentiu je suis la
 class Jeu():
     def __init__(self):
-        self.partie = None
+        self.partie = Partie()
         self.nom_joueur = None
     def jouer_coup(self, rep):
         self.partie.jouer_coup(rep)
@@ -14,7 +14,7 @@ class Jeu():
 
 class Partie():
     def __init__(self):
-        self.airdejeux = Airedejeu(8, 3)
+        self.airdejeux = Airedejeu(8, 10)
         self.docteur = Docteur(2, 0)
         self.daleks = []
         self.niveau = 0
@@ -23,7 +23,17 @@ class Partie():
 
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
-        # bouger Daleks
+
+        for dalek in self.daleks:                                           #ajout de ma part
+            dalek.deplacer(self.docteur)      
+
+    def mouvement_permis(self, rep, docteur):                            #ajout de ma part
+        rep_x, rep_y = rep
+        rep_x += docteur.x
+        rep_y += docteur.y
+        if ( ( (rep_x < 0) or (rep_x >= self.airdejeux.largeur ) ) or ( (rep_y < 0) or (rep_y >= self.airdejeux.hauteur ) ) ):
+            return False
+        return True
 
         # test etat du jeu
 
@@ -44,6 +54,7 @@ class Airedejeu():
     def __init__(self, largeur: int, hauteur: int):
         self.largeur = largeur
         self.hauteur = hauteur
+
 class Docteur():
     # tester les limites avant
     def __init__(self, x: int, y: int):
@@ -81,7 +92,6 @@ class Dalek():
 # La vue aide a afficher les choses visuelles
 class Vue():
     def __init__(self):
-        pass
         self.pos_possibles = reponse_possibles = {
                              "7": [-1,-1],
                              "8": [0, -1],
@@ -96,7 +106,7 @@ class Vue():
 
     def afficher_menu_initial(self):
         print("   ***   Bienvenue au Daleks   ***   ")
-        rep = input(("Votre plaisir ce jour ? \n q - quitter \n j - jouer \n s - score"))
+        rep = input("Votre plaisir ce jour ? \n q - quitter \n j - jouer \n s - score")
         return rep
     def creer_tablo(self, partie):
         tablo = []
@@ -110,7 +120,7 @@ class Vue():
 
     def afficher_aire_de_jeux(self, partie):
         tablo = self.creer_tablo(partie)
-
+ 
         for i in partie.daleks:
             tablo[i.y][i.x] = "W"
 
@@ -119,13 +129,22 @@ class Vue():
         for i in tablo:
             print(i)
 
-        return self.jouer_coup()
+        return self.jouer_coup(partie)
 
-    def jouer_coup(self):
-        print("Jouer votre coups SVP")
+    def jouer_coup(self, partie):                                                              #ajout du parametre partie pour que les donnés de la partie en cours soit transmi
+        print("Jouer votre coups SVP")                                                          # si dans vue self.partie = Partie() alors donnée d'une new partie          
         print("(Utilisez votre clavier numerique)")
         rep = input("Votre choix ici : ")
+        while rep > 9 or rep < 1:
+            print("Choix inexistant")
+            print("Veuillez Rejouer votre coups SVP")
+            rep = input("Votre choix ici : ")
         vrai_rep = self.pos_possibles[rep]
+        while not partie.mouvement_permis(vrai_rep, partie.docteur):                    #ajout parametre partie.docteur et un while pour tant que le deplacement est permis 
+            print("Mouvement impossible")                                                 # pour empecher le joueur de leave 'l'air de jeux
+            print("Veuillez Rejouer votre coups SVP")
+            rep = input("Votre choix ici : ")
+            vrai_rep = self.pos_possibles[rep]
         print(rep, vrai_rep)
         return vrai_rep
 
@@ -144,9 +163,8 @@ class Controleur():
         while self.partie_en_cours:
             rep = self.vue.afficher_aire_de_jeux(self.modele.partie)
             self.modele.jouer_coup(rep)
+            
 
-        rep_coup = self.modele.jouer_coup(rep)
-        # rep = self.vue.afficher_aire_de_jeux(self.modele)
 
 
 
@@ -157,6 +175,7 @@ class Controleur():
 
 if __name__ == "__main__":
     c = Controleur()
+
 
 
 
