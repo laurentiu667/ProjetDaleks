@@ -1,19 +1,16 @@
 import random
 
-
-# test laurentiu je suis la
+#test laurentiu je suis la
 class Jeu():
     def __init__(self):
         self.partie = Partie()
         self.nom_joueur = None
-
     def jouer_coup(self, rep):
         self.partie.jouer_coup(rep)
         # return jouer_coup
 
     def creer_partie(self):
         self.partie = Partie()
-
 
 class Partie():
     def __init__(self):
@@ -27,14 +24,14 @@ class Partie():
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
 
-        for dalek in self.daleks:  # ajout de ma part
-            dalek.deplacer(self.docteur)
+        for dalek in self.daleks:                                           #ajout de ma part
+            dalek.deplacer(self.docteur)      
 
-    def mouvement_permis(self, rep, docteur):  # ajout de ma part
+    def mouvement_permis(self, rep, docteur):                            #ajout de ma part
         rep_x, rep_y = rep
         rep_x += docteur.x
         rep_y += docteur.y
-        if (((rep_x < 0) or (rep_x >= self.airdejeux.largeur)) or ((rep_y < 0) or (rep_y >= self.airdejeux.hauteur))):
+        if ( ( (rep_x < 0) or (rep_x >= self.airdejeux.largeur ) ) or ( (rep_y < 0) or (rep_y >= self.airdejeux.hauteur ) ) ):
             return False
         return True
 
@@ -58,7 +55,6 @@ class Airedejeu():
         self.largeur = largeur
         self.hauteur = hauteur
 
-
 class Docteur():
     # tester les limites avant
     def __init__(self, x: int, y: int):
@@ -70,13 +66,10 @@ class Docteur():
         self.x += rel_x
         self.y += rel_y
 
-
 class Ferraille():
     def __init__(self):
         self.x = None
         self.y = None
-
-
 class Dalek():
     def __init__(self, x, y):
         self.x = x
@@ -96,27 +89,25 @@ class Dalek():
         elif self.y > doc_y:
             self.y -= 1
 
-
 # La vue aide a afficher les choses visuelles
 class Vue():
     def __init__(self):
         self.pos_possibles = reponse_possibles = {
-            "7": [-1, -1],
-            "8": [0, -1],
-            "9": [1, -1],
-            "4": [-1, 0],
-            "5": [0, 0],
-            "6": [1, 0],
-            "1": [-1, 1],
-            "2": [0, 1],
-            "3": [1, 1],
-        }
+                             "7": [-1,-1],
+                             "8": [0, -1],
+                             "9": [1, -1],
+                             "4": [-1, 0],
+                             "5": [0, 0],
+                             "6": [1, 0],
+                             "1": [-1, 1],
+                             "2": [0, 1],
+                             "3": [1, 1],
+                             }
 
     def afficher_menu_initial(self):
         print("   ***   Bienvenue au Daleks   ***   ")
         rep = input("Votre plaisir ce jour ? \n q - quitter \n j - jouer \n s - score")
         return rep
-
     def creer_tablo(self, partie):
         tablo = []
 
@@ -129,7 +120,7 @@ class Vue():
 
     def afficher_aire_de_jeux(self, partie):
         tablo = self.creer_tablo(partie)
-
+ 
         for i in partie.daleks:
             tablo[i.y][i.x] = "W"
 
@@ -140,23 +131,23 @@ class Vue():
 
         return self.jouer_coup(partie)
 
-    def jouer_coup(self, partie):  # ajout du parametre partie pour que les donnÃ©s de la partie en cours soit transmi
-        print("Jouer votre coups SVP")  # si dans vue self.partie = Partie() alors donnÃ©e d'une new partie
+    def jouer_coup(self, partie):                                                              #ajout du parametre partie pour que les donnés de la partie en cours soit transmi
+        print("Jouer votre coups SVP")                                                          # si dans vue self.partie = Partie() alors donnée d'une new partie          
         print("(Utilisez votre clavier numerique)")
         rep = input("Votre choix ici : ")
-        # while (rep > 9) or (rep < 10):
-        #    print("Choix inexistant")
-        #    print("Veuillez Rejouer votre coups SVP")
-        #    rep = input("Votre choix ici : ")
+        numrep = int(rep)
+        while (numrep > 9) or (numrep < 0):
+             print("Choix inexistant")
+             print("Veuillez Rejouer votre coups SVP")
+             rep = input("Votre choix ici : ")
         vrai_rep = self.pos_possibles[rep]
-        while not partie.mouvement_permis(vrai_rep,partie.docteur):  # ajout parametre partie.docteur et un while pour tant que le deplacement est permis
-            print("Mouvement impossible")  # pour empecher le joueur de leave 'l'air de jeux
+        while not partie.mouvement_permis(vrai_rep, partie.docteur):                    #ajout parametre partie.docteur et un while pour tant que le deplacement est permis 
+            print("Mouvement impossible")                                                 # pour empecher le joueur de leave 'l'air de jeux
             print("Veuillez Rejouer votre coups SVP")
             rep = input("Votre choix ici : ")
             vrai_rep = self.pos_possibles[rep]
         print(rep, vrai_rep)
         return vrai_rep
-
 
 class Controleur():
     def __init__(self):
@@ -164,7 +155,7 @@ class Controleur():
         self.modele = Jeu()
         self.vue = Vue()
         rep = self.vue.afficher_menu_initial()
-        if rep == "j":
+        if rep == "j" or "J":
             self.modele.creer_partie()
             self.partie_en_cours = True
             self.jouer_partie()
@@ -173,6 +164,14 @@ class Controleur():
         while self.partie_en_cours:
             rep = self.vue.afficher_aire_de_jeux(self.modele.partie)
             self.modele.jouer_coup(rep)
+            
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
