@@ -148,8 +148,8 @@ class Vue():
     def contact_dalek_docteur(self, partie, controleur):  # Partie faite par Laurentiu
         for dalek in partie.daleks:
             if dalek.x == partie.docteur.x and dalek.y == partie.docteur.y:
-                controleur.partie_en_cours = False
                 print("Tu viens de te faire attraper sale merde")
+                controleur.partie_en_cours = False
                 break
 
     def jouer_coup(self, partie):  # ajout du parametre partie pour que les donnés de la partie en cours soit transmi
