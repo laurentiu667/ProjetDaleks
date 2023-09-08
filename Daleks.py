@@ -81,6 +81,13 @@ class Ferraille():
         self.x = None
         self.y = None
 
+    def colision_dalek_dalek(self, partie):
+
+        # Prendre toutes les positions de tous les daleks et les comparer => if dalekx et daleky =  dalekx(autre) et daleky(autre) alors print F = tas de feraille
+
+        print("test feraille")
+
+
 
 class Dalek():
     def __init__(self, x, y):
@@ -172,6 +179,7 @@ class Controleur():
         self.partie_en_cours = False
         self.modele = Jeu()
         self.vue = Vue()
+        self.ferraille = Ferraille()
         rep = self.vue.afficher_menu_initial()
         if rep == "j" or "J":
             self.modele.creer_partie()
@@ -183,6 +191,8 @@ class Controleur():
             rep = self.vue.afficher_aire_de_jeux(self.modele.partie)
             self.modele.jouer_coup(rep)
             self.vue.contact_dalek_docteur(self.modele.partie, self)  # Partie faite par Laurentiu
+            self.ferraille.colision_dalek_dalek(self)
+
 
 
 if __name__ == "__main__":
