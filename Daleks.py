@@ -1,3 +1,4 @@
+from distutils.command import clean
 import random
 
 
@@ -9,7 +10,6 @@ class Jeu():
 
     def jouer_coup(self, rep):
         self.partie.jouer_coup(rep)
-        # return jouer_coup
 
     def creer_partie(self):
         self.partie = Partie()
@@ -17,12 +17,17 @@ class Jeu():
 
 class Partie():
     def __init__(self):
-        self.airdejeux = Airedejeu(8, 10)
-        self.docteur = Docteur(2, 0)
+        self.airdejeux = Airedejeu(20, 20)
+        self.docteur = Docteur(8, 0)
+        self.statut_docteur = "vivant"
         self.daleks = []
+        self.ferrailles = []
         self.niveau = 0
         self.dalek_par_niveau = 5
         self.creer_niveau()
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
@@ -44,16 +49,45 @@ class Partie():
             if ((numrep >= 1) and (numrep <= 9)):
                 return True
 
+    def supprimer_dalecks(self, daleks_remove,
+                          controleur):  # j'aurais preferer mettre dans class dalek mais je trouve que ça complique la chose pour pas grand chose
+        clean_daleks_remove = []
+        for dalek in daleks_remove:
+            if dalek not in clean_daleks_remove:
+                clean_daleks_remove.append(dalek)
+        for dalek in clean_daleks_remove:
+            self.daleks.remove(dalek)
+        if not self.daleks:
+            controleur.partie_en_cours = False
+
+    def collision(self, controleur):
+        for dalek in self.daleks:
+            if dalek.x == self.docteur.x and dalek.y == self.docteur.y:
+                controleur.partie_en_cours = False
+                self.statut_docteur = "mort"
+
+        daleks_remove = []
+        for i in range(len(self.daleks)):
+            for j in range(i + 1, len(self.daleks)):
+                if self.daleks[i].x == self.daleks[j].x:
+                    daleks_remove.append(self.daleks[i])
+                    daleks_remove.append(self.daleks[j])
+                    feraille = Ferraille(self.daleks[i].x, self.daleks[i].y).creer_ferraille(self)
+
+        self.supprimer_dalecks(daleks_remove, controleur)
+
         # test etat du jeu
 
-        # retourner reponse approprier
+    # retourner reponse approprier
 
     def creer_niveau(self):
         self.niveau += 1
         nb_daleks = self.niveau * self.dalek_par_niveau
         for i in range(nb_daleks):
-            x = random.randrange(self.airdejeux.largeur)
-            y = random.randrange(self.airdejeux.hauteur)
+            x = 10 + i  # pour effectuer des test
+            y = 10 + 1
+            # x = random.randrange(self.airdejeux.largeur)
+            # y = random.randrange(self.airdejeux.hauteur)
             dalek = Dalek(x, y)
             self.daleks.append(dalek)
 
@@ -77,16 +111,19 @@ class Docteur():
 
 
 class Ferraille():
-    def __init__(self):
-        self.x = None
-        self.y = None
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-    def colision_dalek_dalek(self, partie):
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
-        # Prendre toutes les positions de tous les daleks et les comparer => if dalekx et daleky =  dalekx(autre) et daleky(autre) alors print F = tas de feraille
-
-        print("test feraille")
-
+    def creer_ferraille(self, partie):
+        ferraille = Ferraille(self.x, self.y)
+        if not partie.ferrailles:
+            partie.ferrailles.append(ferraille)
+        elif ferraille not in partie.ferrailles:
+            partie.ferrailles.append(ferraille)
 
 
 class Dalek():
@@ -126,7 +163,8 @@ class Vue():
 
     def afficher_menu_initial(self):
         print("   ***   Bienvenue au Daleks   ***   ")
-        rep = input("Votre plaisir ce jour ? \n q - quitter \n j - jouer \n s - score")
+        print("Votre plaisir ce jour ? \n q - quitter \n j - jouer \n s - score")
+        rep = input("Votre choix ici : ")
         return rep
 
     def creer_tablo(self, partie):
@@ -145,22 +183,15 @@ class Vue():
         for i in partie.daleks:
             tablo[i.y][i.x] = "W"
 
+        for i in partie.ferrailles:
+            tablo[i.y][i.x] = "F"
+
         tablo[partie.docteur.y][partie.docteur.x] = "D"
 
         for i in tablo:
             print(i)
 
-        return self.jouer_coup(partie)
-
-    def contact_dalek_docteur(self, partie, controleur):  # Partie faite par Laurentiu
-        for dalek in partie.daleks:
-            if dalek.x == partie.docteur.x and dalek.y == partie.docteur.y:
-                print("Tu viens de te faire attraper sale merde")
-                controleur.partie_en_cours = False
-                break
-
     def jouer_coup(self, partie):  # ajout du parametre partie pour que les donnés de la partie en cours soit transmi
-
         numvalide = False
         while not numvalide:
             print("Jouer votre coups SVP")  # si dans vue self.partie = Partie() alors donnée d'une new partie
@@ -170,8 +201,13 @@ class Vue():
                 vrai_rep = self.pos_possibles[rep]
                 if partie.mouvement_permis(vrai_rep, partie.docteur):
                     numvalide = True
-        print(rep, vrai_rep)
         return vrai_rep
+
+    def controle_etat_de_la_partie(self):
+        pass
+
+    def fin_partie(self):
+        print("Partie Termine \n")
 
 
 class Controleur():
@@ -179,20 +215,26 @@ class Controleur():
         self.partie_en_cours = False
         self.modele = Jeu()
         self.vue = Vue()
-        self.ferraille = Ferraille()
-        rep = self.vue.afficher_menu_initial()
-        if rep == "j" or "J":
-            self.modele.creer_partie()
-            self.partie_en_cours = True
-            self.jouer_partie()
+        self.choix_menu()
+
+    def choix_menu(self):  # ajout irvan
+        choixvalide = False
+        while not choixvalide:
+            rep = self.vue.afficher_menu_initial()
+            if rep == "j" or rep == "J":
+                self.modele.creer_partie()
+                self.partie_en_cours = True
+                self.jouer_partie()
+            elif rep == "q" or rep == "Q":
+                choixvalide = True
 
     def jouer_partie(self):
         while self.partie_en_cours:
+            self.modele.partie.collision(self)  # remplace contact
             rep = self.vue.afficher_aire_de_jeux(self.modele.partie)
-            self.modele.jouer_coup(rep)
-            self.vue.contact_dalek_docteur(self.modele.partie, self)  # Partie faite par Laurentiu
-            self.ferraille.colision_dalek_dalek(self)
-
+            if self.partie_en_cours:
+                self.modele.jouer_coup(self.vue.jouer_coup(self.modele.partie))
+        self.vue.fin_partie()
 
 
 if __name__ == "__main__":
