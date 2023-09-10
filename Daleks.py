@@ -1,3 +1,4 @@
+import random
 class Jeu():
     def __init__(self):
         self.partie = Partie()
@@ -93,10 +94,8 @@ class Partie():
         self.niveau += 1
         nb_daleks = self.niveau * self.dalek_par_niveau
         for i in range(nb_daleks):
-            x = 10 + i  # pour effectuer des test
-            y = 10 + 1
-            # x = random.randrange(self.airdejeux.largeur)
-            # y = random.randrange(self.airdejeux.hauteur)
+            x = random.randrange(self.airdejeux.largeur)
+            y = random.randrange(self.airdejeux.hauteur)
             dalek = Dalek(x, y)
             self.daleks.append(dalek)
 
@@ -214,12 +213,18 @@ class Vue():
     def controle_etat_de_la_partie(self):
         pass
 
-    def fin_partie(self, partie):
-        daleks_morts = partie.collision(self)
+    def fin_partie(self, partie, jeu):
+        nombre_de_dalek = 0
+        for dalek in partie.daleks:
+            if dalek.x == partie.docteur.x and dalek.y == partie.docteur.y:
+                nombre_de_dalek += 1
 
-        print(f"Nombre de Daleks morts : {daleks_morts}")
-        print("Partie Termine \n")
+        nombre_de_ferrailles = len(partie.ferrailles)
 
+        jeu.daleks_tues = partie.dalek_par_niveau - nombre_de_dalek - nombre_de_ferrailles
+        jeu.point_par_partie = jeu.daleks_tues * jeu.point_par_Dalek_detruit
+        print(f"Nombre de Daleks morts : {jeu.daleks_tues}")
+        print(f"Nombre de points pour la partie : {jeu.point_par_partie}")
 
 class Controleur():
     def __init__(self):
@@ -248,7 +253,7 @@ class Controleur():
             if self.partie_en_cours:
                 self.modele.jouer_coup(self.vue.jouer_coup(self.modele.partie))
 
-        self.vue.fin_partie(self.modele.partie)  # Passer la partie en cours à fin_partie
+        self.vue.fin_partie(self.modele.partie, self.modele)  # Passer la partie et l'objet Jeu en cours à fin_partie
 
 
 if __name__ == "__main__":
