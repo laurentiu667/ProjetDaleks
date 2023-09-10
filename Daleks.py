@@ -4,9 +4,7 @@ class Jeu():
         self.partie = Partie()
         self.nom_joueur = None
         self.username_entrer = False
-        self.point_par_Dalek_detruit = 5
         self.point_par_partie = 0
-        self.daleks_tues = 0
 
     def demander_nom_joueur(self):
         self.nom_joueur = input("Entrez votre username : ")
@@ -17,7 +15,6 @@ class Jeu():
 
     def creer_partie(self):
         self.partie = Partie()
-        self.daleks_tues = 0 # reinti chaque partie
 
 class Partie():
     def __init__(self):
@@ -27,11 +24,9 @@ class Partie():
         self.daleks = []
         self.ferrailles = []
         self.niveau = 0
+        self.point_par_Dalek_detruit = 5
         self.dalek_par_niveau = 5
         self.creer_niveau()
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
 
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
@@ -63,16 +58,12 @@ class Partie():
         if not self.daleks:
             controleur.partie_en_cours = False
 
-    def collision(self, controleur):
-        daleks_morts = 0  # Initialisation du nombre de Daleks morts
-
-        for dalek in self.daleks:
-            if dalek.x == self.docteur.x and dalek.y == self.docteur.y:
+    def collision(self, controleur, partie):
+        daleks_remove = []
+        for dalek in partie.daleks:
+            if dalek.x == partie.docteur.x and dalek.y == partie.docteur.y:
                 controleur.partie_en_cours = False
                 self.statut_docteur = "mort"
-                daleks_morts += 1  # Incrémentation du nombre de Daleks morts
-
-        daleks_remove = []
 
         for i in range(len(self.daleks)):
             for j in range(i + 1, len(self.daleks)):
@@ -88,8 +79,6 @@ class Partie():
 
         self.supprimer_dalecks(daleks_remove, controleur)
 
-        return daleks_morts  # Retourner le nombre de Daleks morts
-
     def creer_niveau(self):
         self.niveau += 1
         nb_daleks = self.niveau * self.dalek_par_niveau
@@ -97,7 +86,10 @@ class Partie():
             x = random.randrange(self.airdejeux.largeur)
             y = random.randrange(self.airdejeux.hauteur)
             dalek = Dalek(x, y)
-            self.daleks.append(dalek)
+            if dalek not in self.daleks:
+                self.daleks.append(dalek)
+            else:
+                i -=1
 
 class Airedejeu():
     def __init__(self, largeur: int, hauteur: int):
@@ -134,6 +126,9 @@ class Dalek():
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
     def deplacer(self, docteur):
         doc_x = docteur.x
@@ -210,21 +205,9 @@ class Vue():
                     numvalide = True
         return vrai_rep
 
-    def controle_etat_de_la_partie(self):
-        pass
+    def fin_partie(self, partie):
+        print("fini")
 
-    def fin_partie(self, partie, jeu):
-        nombre_de_dalek = 0
-        for dalek in partie.daleks:
-            if dalek.x == partie.docteur.x and dalek.y == partie.docteur.y:
-                nombre_de_dalek += 1
-
-        nombre_de_ferrailles = len(partie.ferrailles)
-
-        jeu.daleks_tues = partie.dalek_par_niveau - nombre_de_dalek - nombre_de_ferrailles
-        jeu.point_par_partie = jeu.daleks_tues * jeu.point_par_Dalek_detruit
-        print(f"Nombre de Daleks morts : {jeu.daleks_tues}")
-        print(f"Nombre de points pour la partie : {jeu.point_par_partie}")
 
 class Controleur():
     def __init__(self):
@@ -248,12 +231,12 @@ class Controleur():
 
     def jouer_partie(self):
         while self.partie_en_cours:
-            self.modele.partie.collision(self)
+            self.modele.partie.collision(self,self.modele.partie)
             rep = self.vue.afficher_aire_de_jeux(self.modele.partie)
             if self.partie_en_cours:
                 self.modele.jouer_coup(self.vue.jouer_coup(self.modele.partie))
 
-        self.vue.fin_partie(self.modele.partie, self.modele)  # Passer la partie et l'objet Jeu en cours à fin_partie
+        self.vue.fin_partie(self.modele.partie)  # Passer la partie et l'objet Jeu en cours à fin_partie
 
 
 if __name__ == "__main__":
