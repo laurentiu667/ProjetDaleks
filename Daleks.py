@@ -1,3 +1,4 @@
+import pprint
 import random
 
 class Jeu():
@@ -17,10 +18,11 @@ class Score():
             self.score = "Win"
         else:
             self.score = "Loose"
+            
 
 class Partie():
     def __init__(self, ):
-        self.id = random.randrange(10), random.randrange(10)  # pour debogage
+        self.id = random.randrange(10), random.randrange(10) 
         self.airdejeux = self.demander_lair_de_jeux()
         self.docteur = Docteur(2, 0)
         self.statut_docteur = "vivant"
@@ -73,7 +75,7 @@ class Partie():
             rep = "t"
             return True
 
-    def mouvement_permis(self, rep, partie):  # ajout de ma part
+    def mouvement_permis(self, rep, partie):  
         rep_x, rep_y = rep
         rep_x += partie.docteur.x
         rep_y += partie.docteur.y
@@ -89,7 +91,7 @@ class Partie():
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
 
-        for dalek in self.daleks:  # ajout de ma part
+        for dalek in self.daleks: 
             dalek.deplacer(self.docteur)
 
     def collision(self, modele):
@@ -208,7 +210,7 @@ class Dalek():
         return False
 
     @classmethod
-    def supprimer_dalecks(self, daleks_remove, modele):  # j'aurais preferer mettre dans class dalek mais je trouve que ça complique la chose pour pas grand chose
+    def supprimer_dalecks(self, daleks_remove, modele):  
 
         for dalek in daleks_remove:
             modele.partie.daleks.remove(dalek)
@@ -317,7 +319,6 @@ class Controleur():
                 self.vue.jouer_coup(self.modele.partie)
                 self.modele.partie.collision(self.modele)
                 self.vue.afficher_aire_de_jeux(self.modele.partie)
-        self.vue.fin_partie(self.modele.partie)  # Passer la partie et l'objet Jeu en cours à fin_partie
 
 if __name__ == "__main__":
     c = Controleur()
