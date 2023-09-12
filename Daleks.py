@@ -1,6 +1,7 @@
 # Réalisé par Irvan.N et laurentiu.D
 import random
 
+
 class Jeu():
     def __init__(self):
         self.partie_en_cours = False
@@ -8,6 +9,7 @@ class Jeu():
 
     def creer_partie(self):
         self.partie = Partie()
+
 
 class Score():
     def __init__(self, partie):
@@ -18,6 +20,7 @@ class Score():
             self.score = "Win"
         else:
             self.score = "Loose"
+
 
 class Partie():
     def __init__(self, ):
@@ -45,11 +48,11 @@ class Partie():
             while not (pos_x.isnumeric() and pos_y.isnumeric()):
                 pos_x = input("Entrez la largeur du jeux : ")
                 pos_y = input("Entrez la hauteur du jeux : ")
-    
+
             pos_x = int(pos_x)
             pos_y = int(pos_y)
             if pos_x >= 8 and pos_y >= 10:
-                 return Airedejeu(pos_x,pos_y)
+                return Airedejeu(pos_x, pos_y)
             print("Veuillez recommencer, l'un des deux est invalide")
 
     def creer_niveau(self):
@@ -73,7 +76,7 @@ class Partie():
             rep = "t"
             return True
 
-    def mouvement_permis(self, rep, partie):  
+    def mouvement_permis(self, rep, partie):
         rep_x, rep_y = rep
         rep_x += partie.docteur.x
         rep_y += partie.docteur.y
@@ -89,7 +92,7 @@ class Partie():
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
 
-        for dalek in self.daleks:  
+        for dalek in self.daleks:
             dalek.deplacer(self.docteur)
 
     def collision(self, modele):
@@ -132,13 +135,15 @@ class Partie():
                         daleks_remove.append(dalek)
             Dalek.supprimer_dalecks(daleks_remove, modele)
 
+
 class Airedejeu():
     def __init__(self, largeur: int, hauteur: int):
         self.largeur = largeur
         self.hauteur = hauteur
 
+
 class Docteur():
- 
+
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
@@ -153,12 +158,14 @@ class Docteur():
         while True:
             new_x = random.randrange(partie.airdejeux.largeur)
             new_y = random.randrange(partie.airdejeux.hauteur)
-            ferraile = Ferraille(new_x,new_y)
-            while (not Dalek.est_a_proximite(Docteur(new_x, new_y), partie.daleks) and (ferraile not in partie.ferrailles)):
+            ferraile = Ferraille(new_x, new_y)
+            while (not Dalek.est_a_proximite(Docteur(new_x, new_y), partie.daleks) and (
+                    ferraile not in partie.ferrailles)):
                 new_x -= partie.docteur.x
                 new_y -= partie.docteur.y
                 print(partie.docteur.x, partie.docteur.y)
                 return [new_x, new_y]
+
 
 class Ferraille():
     def __init__(self, x, y):
@@ -174,6 +181,7 @@ class Ferraille():
             partie.ferrailles.append(ferraille)
         elif ferraille not in partie.ferrailles:
             partie.ferrailles.append(ferraille)
+
 
 class Dalek():
     def __init__(self, x: int, y: int):
@@ -208,13 +216,14 @@ class Dalek():
         return False
 
     @classmethod
-    def supprimer_dalecks(self, daleks_remove, modele): 
+    def supprimer_dalecks(self, daleks_remove, modele):
 
         for dalek in daleks_remove:
             modele.partie.daleks.remove(dalek)
             modele.partie.score += modele.partie.point_par_Dalek_detruit
         if not modele.partie.daleks:
             modele.partie_en_cours = False
+
 
 # La vue aide a afficher les choses visuelles
 class Vue():
@@ -261,12 +270,12 @@ class Vue():
         for i in tablo:
             print(i)
 
-        print(f"Crédits cosmiques  : {partie.score} \n" )
+        print(f"Crédits cosmiques  : {partie.score} \n")
 
-    def jouer_coup(self, partie):  
+    def jouer_coup(self, partie):
         numvalide = False
         while not numvalide:
-            print("Jouer votre coups SVP") 
+            print("Jouer votre coups SVP")
             print("(Utilisez votre clavier numerique)")
             rep = input("Votre choix ici : ")
             if partie.choix_possible(rep, partie):
@@ -280,12 +289,12 @@ class Vue():
 
         return partie.jouer_coup(vrai_rep)
 
-    def afficher_score(self,score, daleks):
-         print(f"Partie : {score.score}")
-         print(f"joueur : {score.nom} \n crédits cosmiques  : {score.point} \n")
-         if daleks:
+    def afficher_score(self, score, daleks):
+        print(f"Partie : {score.score}")
+        print(f"joueur : {score.nom} \n crédits cosmiques  : {score.point} \n")
+        if daleks:
             print(f"nombre de dalek encore en vie : {score.dalek_vivant} \n")
-        
+
 
 class Controleur():
     def __init__(self):
@@ -323,7 +332,7 @@ class Controleur():
                 self.vue.jouer_coup(self.modele.partie)
                 self.modele.partie.collision(self.modele)
             self.vue.afficher_aire_de_jeux(self.modele.partie)
-        
+
 
 if __name__ == "__main__":
     c = Controleur()
