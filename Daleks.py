@@ -1,4 +1,4 @@
-import pprint
+# Réalisé par Irvan.N et laurentiu.D
 import random
 
 class Jeu():
@@ -18,11 +18,9 @@ class Score():
             self.score = "Win"
         else:
             self.score = "Loose"
-            
 
 class Partie():
     def __init__(self, ):
-        self.id = random.randrange(10), random.randrange(10) 
         self.airdejeux = self.demander_lair_de_jeux()
         self.docteur = Docteur(2, 0)
         self.statut_docteur = "vivant"
@@ -91,7 +89,7 @@ class Partie():
     def jouer_coup(self, rep):
         self.docteur.changer_position(rep)
 
-        for dalek in self.daleks: 
+        for dalek in self.daleks:  
             dalek.deplacer(self.docteur)
 
     def collision(self, modele):
@@ -140,7 +138,7 @@ class Airedejeu():
         self.hauteur = hauteur
 
 class Docteur():
-    # tester les limites avant
+ 
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
@@ -155,8 +153,8 @@ class Docteur():
         while True:
             new_x = random.randrange(partie.airdejeux.largeur)
             new_y = random.randrange(partie.airdejeux.hauteur)
-
-            while not Dalek.est_a_proximite(Docteur(new_x, new_y), partie.daleks):
+            ferraile = Ferraille(new_x,new_y)
+            while (not Dalek.est_a_proximite(Docteur(new_x, new_y), partie.daleks) and (ferraile not in partie.ferrailles)):
                 new_x -= partie.docteur.x
                 new_y -= partie.docteur.y
                 print(partie.docteur.x, partie.docteur.y)
@@ -210,7 +208,7 @@ class Dalek():
         return False
 
     @classmethod
-    def supprimer_dalecks(self, daleks_remove, modele):  
+    def supprimer_dalecks(self, daleks_remove, modele): 
 
         for dalek in daleks_remove:
             modele.partie.daleks.remove(dalek)
@@ -263,12 +261,12 @@ class Vue():
         for i in tablo:
             print(i)
 
-        print(f"Votre score est de : {partie.score} \n" )
+        print(f"Crédits cosmiques  : {partie.score} \n" )
 
-    def jouer_coup(self, partie):  # ajout du parametre partie pour que les donnés de la partie en cours soit transmi
+    def jouer_coup(self, partie):  
         numvalide = False
         while not numvalide:
-            print("Jouer votre coups SVP")  # si dans vue self.partie = Partie() alors donnée d'une new partie
+            print("Jouer votre coups SVP") 
             print("(Utilisez votre clavier numerique)")
             rep = input("Votre choix ici : ")
             if partie.choix_possible(rep, partie):
@@ -282,6 +280,13 @@ class Vue():
 
         return partie.jouer_coup(vrai_rep)
 
+    def afficher_score(self,score, daleks):
+         print(f"Partie : {score.score}")
+         print(f"joueur : {score.nom} \n crédits cosmiques  : {score.point} \n")
+         if daleks:
+            print(f"nombre de dalek encore en vie : {score.dalek_vivant} \n")
+        
+
 class Controleur():
     def __init__(self):
         self.modele = Jeu()
@@ -293,12 +298,11 @@ class Controleur():
                 self.modele.creer_partie()
                 self.jouer_partie()
                 self.modele.scores.append(Score(self.modele.partie))
+                self.vue.afficher_score(self.modele.scores[-1], self.modele.partie.daleks)
             elif rep == "s":
                 for score in self.modele.scores:
-                    print(f"\n\nPartie : {score.score}")
-                    print(f"joueur : {score.nom} \n score : {score.point}")
-                    if self.modele.partie.daleks:
-                        print(f"nombre de dalek encore en vie : {score.dalek_vivant} \n")
+                    print("\n")
+                    self.vue.afficher_score(score, self.modele.partie.daleks)
             rep = self.choix_menu()
 
     def choix_menu(self):
@@ -318,7 +322,8 @@ class Controleur():
             if self.modele.partie_en_cours:
                 self.vue.jouer_coup(self.modele.partie)
                 self.modele.partie.collision(self.modele)
-                self.vue.afficher_aire_de_jeux(self.modele.partie)
+            self.vue.afficher_aire_de_jeux(self.modele.partie)
+        
 
 if __name__ == "__main__":
     c = Controleur()
