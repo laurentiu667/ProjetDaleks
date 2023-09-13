@@ -163,9 +163,7 @@ class Docteur():
                     ferraile not in partie.ferrailles)):
                 new_x -= partie.docteur.x
                 new_y -= partie.docteur.y
-                print(partie.docteur.x, partie.docteur.y)
                 return [new_x, new_y]
-
 
 class Ferraille():
     def __init__(self, x, y):
@@ -270,7 +268,7 @@ class Vue():
         for i in tablo:
             print(i)
 
-        print(f"Crédits cosmiques  : {partie.score} \n")
+        print(f"Credits cosmiques  : {partie.score} \n")
 
     def jouer_coup(self, partie):
         numvalide = False
@@ -291,7 +289,7 @@ class Vue():
 
     def afficher_score(self, score, daleks):
         print(f"Partie : {score.score}")
-        print(f"joueur : {score.nom} \n crédits cosmiques  : {score.point} \n")
+        print(f"joueur : {score.nom} \n credits cosmiques  : {score.point} \n")
         if daleks:
             print(f"nombre de dalek encore en vie : {score.dalek_vivant} \n")
 
