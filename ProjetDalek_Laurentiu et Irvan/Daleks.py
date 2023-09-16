@@ -10,7 +10,6 @@ class Jeu():
     def creer_partie(self):
         self.partie = Partie()
 
-
 class Score():
     def __init__(self, partie):
         self.nom = partie.nom_joueur
@@ -23,7 +22,7 @@ class Score():
 
 
 class Partie():
-    def __init__(self, ):
+    def __init__(self):
         self.airdejeux = self.demander_lair_de_jeux()
         self.docteur = Docteur(2, 0)
         self.statut_docteur = "vivant"
@@ -149,9 +148,10 @@ class Docteur():
         self.y = y
 
     def changer_position(self, pos_relative):
-        rel_x, rel_y = pos_relative
-        self.x += rel_x
-        self.y += rel_y
+        if pos_relative is not None:
+            rel_x, rel_y = pos_relative
+            self.x += rel_x
+            self.y += rel_y
 
     def teleport(self, partie):
 
@@ -159,11 +159,30 @@ class Docteur():
             new_x = random.randrange(partie.airdejeux.largeur)
             new_y = random.randrange(partie.airdejeux.hauteur)
             ferraile = Ferraille(new_x, new_y)
-            while (not Dalek.est_a_proximite(Docteur(new_x, new_y), partie.daleks) and (
-                    ferraile not in partie.ferrailles)):
+            while (not Dalek.est_a_proximite(Docteur(new_x, new_y), partie.daleks) and (ferraile not in partie.ferrailles)):
                 new_x -= partie.docteur.x
                 new_y -= partie.docteur.y
                 return [new_x, new_y]
+            
+    def zapper(self, partie):
+        daleks_a_supprimer = []
+
+        for dalek in partie.daleks:
+            distance_x = abs(dalek.x - self.x)
+            distance_y = abs(dalek.y - self.y)
+            if distance_x <= 1 and distance_y <= 1:
+                daleks_a_supprimer.append(dalek)
+
+        for dalek in daleks_a_supprimer:
+            partie.daleks.remove(dalek)
+
+        if daleks_a_supprimer:
+            partie.score += partie.point_par_Dalek_detruit
+            print("Dalek(s) zappe(s) !")
+            
+        else:
+            print("Aucun Dalek proche a zapper.")
+        print(len(partie.daleks))
 
 class Ferraille():
     def __init__(self, x, y):
@@ -212,6 +231,7 @@ class Dalek():
             if distance_x <= 2 and distance_y <= 2:
                 return True
         return False
+
 
     @classmethod
     def supprimer_dalecks(self, daleks_remove, modele):
@@ -283,6 +303,9 @@ class Vue():
                         numvalide = True
                 elif rep == "t":
                     vrai_rep = partie.docteur.teleport(partie)
+                    numvalide = True
+                elif rep == "z":
+                    vrai_rep = partie.docteur.zapper(partie)
                     numvalide = True
 
         return partie.jouer_coup(vrai_rep)
